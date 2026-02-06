@@ -1,81 +1,85 @@
-🔍 Document-Grounded RAG System (LLM + Vector Search)
+# 🔍 Document-Grounded RAG System (LLM + Vector Search)
 
-A production-quality Retrieval-Augmented Generation (RAG) system that answers questions strictly from a provided document, with explicit hallucination prevention and source citations.
+A **production-quality Retrieval-Augmented Generation (RAG)** system that answers questions **strictly from a provided document**, with explicit hallucination prevention and source citations.
 
-Built to demonstrate real-world LLM system design, not demos.
+Built to demonstrate **real-world LLM system design**, not demos.
 
-⭐ Why This Project Matters
+---
 
-Prevents LLM hallucinations using retrieval gating + strict prompting
+## ⭐ Why This Project Matters
 
-Implements a complete RAG pipeline end-to-end
+- Prevents **LLM hallucinations** using retrieval gating and strict prompting  
+- Implements a **complete RAG pipeline** end-to-end  
+- Produces **auditable answers** with page-level citations  
+- Designed with **reproducibility and correctness** in mind  
+- Uses **modern LangChain architecture** (no deprecated APIs)
 
-Produces auditable answers with page-level citations
+---
 
-Designed with reproducibility and correctness in mind
+## 🧠 What It Does (High Level)
 
-Uses modern LangChain architecture (no deprecated APIs)
+- Ingests a PDF document  
+- Converts text into semantic embeddings  
+- Stores embeddings in a persistent vector database  
+- Retrieves only relevant context for each question  
+- Generates answers **only from retrieved content**  
+- Refuses unsupported questions with a clear response  
 
-🧠 What It Does (High Level)
+---
 
-Ingests a PDF document
+## ⚙️ Tech Stack
 
-Converts it into semantic embeddings
+- **Language:** Python 3.12  
+- **LLM:** Google Gemini  
+- **Embeddings:** Jina AI (`jina-embeddings-v3`)  
+- **Framework:** LangChain (Runnable-based)  
+- **Vector DB:** ChromaDB  
+- **Document Parsing:** PyPDF  
+- **Environment Management:** python-dotenv  
 
-Stores embeddings in a persistent vector database
+---
 
-Retrieves only relevant context for each question
+## 🧩 System Architecture
 
-Generates answers only from retrieved content
 
-Refuses unsupported questions with a clear response
 
-⚙️ Tech Stack
-
-Language: Python 3.12
-
-LLM: Google Gemini
-
-Embeddings: Jina AI (jina-embeddings-v3)
-
-Framework: LangChain (Runnable-based)
-
-Vector DB: ChromaDB
-
-Document Parsing: PyPDF
-
-Environment Management: python-dotenv
-
-🧩 System Architecture
 PDF → Chunking → Embeddings → Vector Store
-                         ↓
-                    Semantic Search
-                         ↓
-                   Context Filtering
-                         ↓
-                    LLM Generation
-                         ↓
-                 Answer + Citations
+↓
+Semantic Search
+↓
+Context Filtering
+↓
+LLM Generation
+↓
+Answer + Citations
 
-🛡️ Hallucination Control (Key Design Focus)
 
-This system does not guess.
+---
+
+## 🛡️ Hallucination Control (Key Design Focus)
+
+This system **does not guess**.
 
 Hallucination prevention is enforced using:
 
-Similarity score thresholding (weak matches are discarded)
-
-Context-only prompting (no external knowledge allowed)
-
-Exact-response enforcement for unsupported questions
-
-Single-source retrieval (no mixed context)
+- **Similarity score thresholding** (weak matches are discarded)  
+- **Context-only prompting** (no external knowledge allowed)  
+- **Exact-response enforcement** for unsupported questions  
+- **Single-source retrieval** (no mixed context)  
 
 If the answer is not found, the system responds:
 
+
+
 Not found in the document.
 
-💬 Example Interaction
+
+---
+
+## 💬 Example Interaction
+
+
+
 Question> What is Crosswalk guards?
 
 Answer:
@@ -85,27 +89,45 @@ Sources:
 [1] page=5 | Crosswalk guards direct the movement of children along or across highways...
 
 
-Unsupported question:
+**Unsupported question:**
+
+
 
 Question> What is the capital of France?
 
 Answer:
 Not found in the document.
 
-📁 Project Structure
-.
-├── data/           # Input PDF document
-├── chroma_db/      # Persistent vector database
-├── output/         # Saved evaluation results
-├── rag_cli.py      # Main application
+
+---
+
+## 📁 Project Structure
+
+├── data/            # Input PDF document
+
+├── chroma_db/       # Persistent vector database
+
+├── output/          # Saved evaluation results
+
+├── rag_cli.py       # Main application
+
 ├── requirements.txt
+
 └── README.md
 
-🚀 How to Run
+
+
+---
+
+## 🚀 How to Run
+
+```bash
 python rag_cli.py
 
+```
 
-The system:
+
+## The system:
 
 Builds or loads the vector database
 
@@ -115,7 +137,7 @@ Saves results to output/results.txt
 
 Launches an interactive CLI
 
-🔍 Engineering Highlights
+## 🔍 Engineering Highlights
 
 Relevance-gated retrieval using similarity scores
 
@@ -127,11 +149,11 @@ Single-pass retrieval (no redundant queries)
 
 Clean separation of ingestion, retrieval, and generation logic
 
-📌 Use Cases
+# 📌 Use Cases
 
 Internal knowledge assistants
 
-Policy / compliance Q&A
+Policy and compliance Q&A
 
 Technical documentation search
 
@@ -139,11 +161,12 @@ Regulated or high-trust LLM systems
 
 Enterprise RAG prototypes
 
-📄 License
+# 📄 License
 
 Released for educational and portfolio use.
 
-👋 Recruiter Note
+# 👋 Recruiter Note
 
-This project focuses on how LLMs should behave in real systems:
+This project focuses on how LLM systems should behave in production:
+
 predictable, grounded, and explainable — not just “cool outputs”.
