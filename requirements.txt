@@ -1,0 +1,18 @@
+# Core LangChain packages (pinned to known working versions)
+langchain==0.1.20
+langchain-core==0.1.53
+langchain-community==0.0.38
+langchain-text-splitters==0.0.1
+langchain-google-genai==1.0.3
+
+# Vector DB
+chromadb==0.5.23
+
+# PDF processing
+pypdf==4.2.0
+
+# Environment variables
+python-dotenv==1.0.1
+
+# Pydantic (critical: keep v1 for this stack)
+pydantic==1.10.26
