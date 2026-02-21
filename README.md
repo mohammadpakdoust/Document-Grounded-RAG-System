@@ -11,154 +11,66 @@ Built to demonstrate **real-world LLM system design**, not demos.
 - Prevents **LLM hallucinations** using retrieval gating and strict prompting  
 - Implements a **complete RAG pipeline** end-to-end  
 - Produces **auditable answers** with page-level citations  
-- Designed with **reproducibility and correctness** in mind  
-- Uses **modern LangChain architecture** (no deprecated APIs)
+# Document-Grounded RAG CLI
 
----
+A concise, production-minded Retrieval-Augmented Generation (RAG) CLI that answers questions strictly from a provided PDF and refuses unsupported or unsafe requests. It is built for predictable, grounded responses with clear guardrails.
 
-## 🧠 What It Does (High Level)
+## Features
+- PDF ingestion, chunking, embedding, and retrieval with a persistent vector store
+- Deterministic answers (temperature 0) using retrieved context only
+- Guardrails for off-topic requests, prompt injection attempts, and PII detection
+- Retrieval gating with a relevance threshold and explicit refusal behavior
+- Faithfulness evaluation (YES/NO/N/A) and structured logging
 
-- Ingests a PDF document  
-- Converts text into semantic embeddings  
-- Stores embeddings in a persistent vector database  
-- Retrieves only relevant context for each question  
-- Generates answers **only from retrieved content**  
-- Refuses unsupported questions with a clear response  
+## Tech Stack
+- Python 3.12
+- Google Gemini (ChatGoogleGenerativeAI)
+- Jina Embeddings (jina-embeddings-v3)
+- LangChain + Chroma
+- PyPDF + python-dotenv
 
----
-
-## ⚙️ Tech Stack
-
-- **Language:** Python 3.12  
-- **LLM:** Google Gemini  
-- **Embeddings:** Jina AI (`jina-embeddings-v3`)  
-- **Framework:** LangChain (Runnable-based)  
-- **Vector DB:** ChromaDB  
-- **Document Parsing:** PyPDF  
-- **Environment Management:** python-dotenv  
-
----
-
-## 🧩 System Architecture
-
-
-
-PDF → Chunking → Embeddings → Vector Store
-↓
-Semantic Search
-↓
-Context Filtering
-↓
-LLM Generation
-↓
-Answer + Citations
-
-
----
-
-## 🛡️ Hallucination Control (Key Design Focus)
-
-This system **does not guess**.
-
-Hallucination prevention is enforced using:
-
-- **Similarity score thresholding** (weak matches are discarded)  
-- **Context-only prompting** (no external knowledge allowed)  
-- **Exact-response enforcement** for unsupported questions  
-- **Single-source retrieval** (no mixed context)  
-
-If the answer is not found, the system responds:
-
-
-
-Not found in the document.
-
-
----
-
-## 💬 Example Interaction
-
-
-
-Question> What is Crosswalk guards?
-
-Answer:
-Crosswalk guards direct the movement of children along or across highways going to or from school.
-
-Sources:
-[1] page=5 | Crosswalk guards direct the movement of children along or across highways...
-
-
-**Unsupported question:**
-
-
-
-Question> What is the capital of France?
-
-Answer:
-Not found in the document.
-
-
----
-
-## 📁 Project Structure
-
-├── data/            # Input PDF document
-
-├── chroma_db/       # Persistent vector database
-
-├── output/          # Saved evaluation results
-
-├── rag_cli.py       # Main application
-
-├── requirements.txt
-
-└── README.md
-
-
-
----
-
-## 🚀 How to Run
+## How to Run
+1. Add a PDF to `data/`
+2. Set `JINA_API_KEY` and `GOOGLE_API_KEY` in `.env`
+3. Run:
 
 ```bash
 python rag_cli.py
-
 ```
 
+Results can be saved to `output/results.txt` in a required structured format when logging is enabled in the CLI.
 
-## The system:
+## Project Structure
+```
+.
+├── data/           # Input PDF document
+├── chroma_db/      # Persistent vector database
+├── output/         # Logged results
+├── rag_cli.py      # Main application
+├── requirements.txt
+└── README.md
+```
 
-Builds or loads the vector database
+## Security and Robustness
+- Domain-limited answers (Nova Scotia driving/road rules only)
+- Retrieval gating with a similarity threshold
+- Prompt hardening with strict context-only instructions
 
-Runs predefined evaluation queries
+## Prompt Injection Defenses (Required)
+- Regex/pattern-based blocking of prompt injection attempts (e.g., "ignore previous instructions", "system prompt", "### SYSTEM"); blocked requests return `POLICY_BLOCK`.
+- Instruction/data separation using `<retrieved_context>...</retrieved_context>` and an explicit "use only context" rule.
+- Strict retrieval gating + refusal: the model answers only when relevant context is retrieved; otherwise it refuses.
 
-Saves results to output/results.txt
+## Evaluation Metric
+- **Faithfulness (YES/NO/N/A):** checks whether the answer is supported by retrieved context.
+- **Why it matters:** it directly measures grounding and hallucination risk and is simple, auditable, and appropriate for RAG systems.
 
-Launches an interactive CLI
-
-## 🔍 Engineering Highlights
-
-Relevance-gated retrieval using similarity scores
-
-Persistent embeddings with automatic rebuild on document change
-
-Deterministic generation (temperature = 0)
-
-Single-pass retrieval (no redundant queries)
-
-Clean separation of ingestion, retrieval, and generation logic
-
-# 📌 Use Cases
-
-Internal knowledge assistants
-
-Policy and compliance Q&A
-
-Technical documentation search
-
-Regulated or high-trust LLM systems
-
+## Findings from Security and Evaluation Test Queries
+- Injection attempts are blocked with `POLICY_BLOCK`.
+- Off-topic questions are refused with a domain-limited message.
+- PII is detected and stripped; the query is still processed (non-blocking).
+- Empty queries are handled with a clear error and logged when logging is enabled.
+- Borderline questions may return "Not found in the document" depending on the retrieval threshold.
 Enterprise RAG prototypes
 
 # 📄 License
